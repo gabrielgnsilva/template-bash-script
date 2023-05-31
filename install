@@ -1,0 +1,277 @@
+#!/bin/bash
+
+#==============================================================================
+# HEADER
+#==============================================================================
+#%
+#% NAME
+#%    Shellscript template
+#%
+#% DESCRIPTION
+#+    This is a shellscript template.
+#+
+#% SYNOPSIS
+#+    ${script_name}: [Options..] [Arguments..]
+#+
+#+ OPTIONS
+#+    -h, --help                    Display help message and exit
+#%
+#+    -l, --log-file                Custom log file location.
+#%                                  Default is '/dev/null'.
+#%
+#+    -L, --log-level               Change the log level, default is '3'
+#%                                      0 -> Log only CRITICAL messages.
+#%                                      1 -> Log CRITICAL and ERROR messages.
+#%                                      2 -> Log CRITICAL, ERROR and WARNING
+#%                                           messages.
+#%                                      3 -> Log CRITITAL, ERROR, WARNING and
+#%                                           INFO messages.
+#%                                      4 -> Log CRITICAL, ERROR, WARNING,
+#%                                           INFO and DEBUG messages.
+#%                                      5 -> log CRITICAL, ERROR, WARNING,
+#%                                           INFO, DEBUG and TRACE messages.
+#%
+#+    -o, --option                  Do nothing.
+#+
+#+ EXAMPLE
+#+    ${script_name} --help
+#+    ${script_name} -l script.log -L 5 --option
+#%
+#==============================================================================
+#/ IMPLEMENTATION
+#/    Version         ${script_name} 1.0
+#/    Author          Gabriel Nascimento
+#/    Copyright       Copyright (c) Gabriel Nascimento (gnsilva.com)
+#/    License         MIT License
+#/
+#==============================================================================
+#) COPYRIGHT
+#)    Copyright (c) Gabriel Nascimento. Licence MIT License:
+#)    <https://opensource.org/licenses/MIT>.
+#)
+#)    Permission is hereby granted, free of charge, to any person obtaining a
+#)    copy of this software and associated documentation files (the
+#)    "Software"), to deal in the Software without restriction, including
+#)    without limitation the rights to use, copy, modify, merge, publish,
+#)    distribute, sublicense, and/or sell copies of the Software, and to permit
+#)    persons to whom the Software is furnished to do so, subject to the
+#)    following conditions:
+#)
+#)    The above copyright notice and this permission notice shall be included
+#)    in all copies or substantial portions of the Software.
+#)
+#)    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+#)    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#)    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+#)    NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+#)    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+#)    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+#)    USE OR OTHER DEALINGS IN THE SOFTWARE.
+#)
+#==============================================================================
+# UTILS
+#
+#
+#    Script "utils/_check_dependencies.sh"    check for missing dependencies
+#
+#    Script "utils/_common_utils.sh"          Handles errors and logging on
+#                                             common commands.
+#
+#    Script "utils/_create.sh"                Creates a file or a folder,
+#                                             if it does not exist.
+#
+#    Script "utils/_do_countdown.sh"          Perform a countdown for the
+#                                             specified number of seconds
+#
+#    Script "utils/_helper.sh"                Handles the help messages, either
+#                                             full or usage, from the info
+#                                             on this header.
+#
+#    Script "utils/_logger.sh"                Handles logging.
+#
+#    Script "utils/_trapper.sh"               Trap errors, exit and interrupt
+#                                             signals to run some cleanup code.
+#
+#    Script "utils/_validate_arguments.sh"    Used to validate a string or
+#                                             argument.
+#
+#    Script "utils/_write_permission.sh"      Used to check if user has write
+#                                             permission on a given folder.
+#
+#==============================================================================
+# DEBUG OPTIONS
+    set +o xtrace  # Trace the execution of the script (DEBUG)
+    set +o noexec  # Don't execute commands (Ignored by interactive shells)
+#
+#==============================================================================
+# BASH OPTIONS
+    set   -o nounset     # Exposes unset variables
+    set   -o errexit     # Used to exit upon error, avoiding cascading errors
+    set   -o pipefail    # Unveils hidden failures
+    set   -o noclobber   # Avoid overwriting files (echo "hi" > foo)
+    set   -o errtrace    # Inherit trap on ERR to functions, commands and etc.
+    shopt -s nullglob    # Non-matching globs are removed ('*.foo' => '')
+    shopt -s failglob    # Non-matching globs throw errors
+    shopt -u nocaseglob  # Case insensitive globs
+    shopt -s dotglob     # Wildcards match hidden files ("*.sh" => ".foo.sh")
+    shopt -s globstar    # Recursive matches ('a/**/*.rb' => 'a/b/c/d.rb')
+#
+#==============================================================================
+# TRAPS
+    # Handled by script "utils/_trapper.sh".
+#
+#==============================================================================
+# END_OF_HEADER
+#==============================================================================
+
+# Section: Script Init
+
+# shellcheck disable=SC1090
+function script_init() {
+
+    current_dir="${PWD}"
+
+    IFS=$' \t\n'
+
+    script_head=$(command grep --no-messages --line-number "^# END_OF_HEADER" "${0}" | command head -1 | cut --fields=1 --delimiter=:)
+    script_name="$(command basename "${0}")"
+    script_dir="$(command cd "$(command dirname "${0}")" && command pwd )"
+    script_path="${script_dir?}/${script_name}"
+    script_params="${*}"
+
+    script_logfile="${script_dir}/logs/install.log" # default is '/dev/null'
+    script_loglevel=3  # default is 3
+
+    script_tempdir=$(command mktemp --directory -t tmp.XXXXXXXXXX)
+    script_tempfile=$(command mktemp -t tmp.XXXXXXXXXX)
+
+    command mkdir --parents "$(command dirname "${script_logfile}")" \
+        || {
+            local exit_code="${?}"
+            command printf "Failed to create log file: \"%s\".\nMake sure it is a valid path and that you have permission to use it." "${script_logfile}"
+            exit "${exit_code}"
+        }
+
+    for file in "${script_dir}"/utils/_*.sh; do
+        if  [[ ! "$(command basename "${file}")" == "_trapper.sh" ]] ; then
+            source "${file}"
+        fi
+    done
+}
+
+# Section: Script Functions
+
+#TODO Define script functions here
+# ...
+
+# Section: Main Program
+
+# shellcheck disable=SC1091
+function main() {
+
+    script_init "${@}"
+
+    if [[ "${#}" -lt 1 ]]; then
+        display_usage_help
+        exit 0
+    fi
+
+    local i
+    for i in "${@}"; do
+        case "${i}" in
+            -h | help | --help )
+                display_full_help
+                exit 0
+                ;;
+        esac
+    done
+
+    local opts
+    while [[ "${#}" -gt 0 ]]; do
+        case "${1:-}" in
+            -l | --log-file )
+                command shift
+                local file_path="${1:-}"
+                local filename
+                local directory
+
+                if [[ -z "${file_path}" ]]; then
+                    command printf "%s: missing file operand\n" "${script_name}" >&2
+                    command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                    exit 1
+                fi
+
+                directory=$(command dirname "${file_path}" 2>/dev/null)
+                if [[ ! "${directory}" =~ ^/ ]]; then
+                    directory="${PWD}/${directory}"
+                fi
+
+                if [[ ! "${directory}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
+                    command printf "%s: Invalid directory name\n" "${script_name}" >&2
+                    command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                    exit 1
+                fi
+
+                filename=$(command basename "${file_path}")
+                if [[ ! "${filename}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
+                    command printf "%s: Invalid filename\n" "${script_name}" >&2
+                    command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                    exit 1
+                fi
+
+                if ! has_write_permission "${directory}"; then
+                    command printf "%s: cannot set log directory to \"%s\": Permission denied" "${script_name}" "${directory}" >&2
+                    exit 1
+                fi
+
+                command mkdir "${directory}" --parents          \
+                    && command touch "${directory}/${filename}" \
+
+                script_logfile="${file_path}"
+                ;;
+            -L | --log-level )
+                command shift
+                if [[ ! "${1:-}" =~ ^(0|1|2|3|4|5)$ ]]; then
+                    command printf "%s: Invalid log level\n" "${script_name}" >&2
+                    command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                    exit 1
+                fi
+                script_loglevel="${1}"
+                ;;
+            -o | --option )
+                :
+                ;;
+            * )
+                command printf "%s: Invalid option \"%s\"\n" "${script_name}" "${1:-}" >&2
+                command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                exit 1
+                ;;
+        esac
+        command shift
+    done
+
+    #TODO Define options logic here
+    # ...
+
+    source "${script_dir}"/utils/_trapper.sh
+    do_cd "${script_dir}"
+
+    trace "Origin cwd: '${current_dir}'."
+    trace "Header size: ${script_head}."
+    trace "Script name: '${script_name}'."
+    trace "Script directory: '${script_dir}'."
+    trace "Script path: '${script_path}'."
+    trace "Script param: '${script_params}'."
+    trace "Script log file: '${script_logfile}'."
+    trace "Script log level: ${script_loglevel}."
+    trace "Temporary directory: '${script_tempdir}'."
+    trace "Temporary file: '${script_tempfile}'."
+
+    #TODO Define script logic from here
+    # ...
+}
+
+# Invoke main with args only if not sourced
+if ! (return 0 2> /dev/null); then
+    main "${@}"
+fi
