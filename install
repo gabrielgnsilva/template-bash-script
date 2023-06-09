@@ -165,10 +165,37 @@ function script_init() {
             exit "${exit_code}"
         }
 
-    for file in "${script_dir}"/utils/_*.sh; do
-        if  [[ ! "$(command basename "${file}")" == "_trapper.sh" ]] ; then
-            source "${file}"
+function trappers() {
+
+    if [[ "${#}" -lt 1 ]]; then
+        printf "trappers: missing argument\n" >&2
+        printf "\nOPTIONS\n%s" "--on  Enable Trappers" >&2
+        printf "\n%s\n" "--off Disable Trappers\n" >&2
+        exit 1
         fi
+
+    if [[ ! "${1:-}" =~ ^(--on|--off)$ ]]; then
+        printf "\ntrappers: Invalid argument\n" >&2
+        printf "\nOPTIONS\n%s" "--on  Enable Trappers" >&2
+        printf "\n%s\n" "--off Disable Trappers\n" >&2
+        exit 1
+    fi
+
+    local status="${1:-}"
+    case "${status}" in
+        --on )
+            trap ctrlC INT  # Trap CTRL_C and call ctrlC
+            trap errTrapper ERR  # Trap ERR and call errTrapper
+            trap exitTrapper EXIT  # Trap EXIT on exitTrapper
+            ;;
+        --off )
+            trap "" INT  # Disable trap on CTRL_C
+            trap "" ERR  # Disable trap on ERR
+            trap "" EXIT  # Disable trap on EXIT
+            ;;
+    esac
+}
+
 function ctrlC() {
 
     trappers --off  # Disable trappers to prevent recursion
