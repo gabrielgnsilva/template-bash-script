@@ -78,6 +78,8 @@
 #)
 #==============================================================================
 # UTILS
+#       Script "utils/_checkDependencies.sh"
+#           Check if a given package exists
 #
 #
 #    Script "utils/_check_dependencies.sh"    check for missing dependencies
