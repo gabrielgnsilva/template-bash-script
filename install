@@ -158,11 +158,10 @@ function script_init() {
     script_tempdir=$(command mktemp --directory -t tmp.XXXXXXXXXX)
     script_tempfile=$(command mktemp -t tmp.XXXXXXXXXX)
 
-    command mkdir --parents "$(command dirname "${script_logfile}")" \
-        || {
-            local exit_code="${?}"
-            command printf "Failed to create log file: \"%s\".\nMake sure it is a valid path and that you have permission to use it." "${script_logfile}"
-            exit "${exit_code}"
+    local util
+    for util in "${scriptDir}"/utils/_*.sh; do
+        source "${util}"
+    done
         }
 
 function trappers() {
