@@ -84,7 +84,8 @@
 #       Script "utils/_create.sh"
 #           Creates a file or a folder, if it does not exist
 #
-#    Script "utils/_check_dependencies.sh"    check for missing dependencies
+#       Script "utils/_doCountdown.sh"
+#           Perform a countdown for the specified number of seconds
 #
 #       Script "utils/_displayHelp.sh"
 #           Handles the help messages, either full or usage,
