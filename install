@@ -131,21 +131,27 @@
 
 # Section: Script Init
 
-# shellcheck disable=SC1090
-function script_init() {
-
-    current_dir="${PWD}"
+# shellcheck disable=1090
+function scriptInit() {
 
     IFS=$' \t\n'
 
-    script_head=$(command grep --no-messages --line-number "^# END_OF_HEADER" "${0}" | command head -1 | cut --fields=1 --delimiter=:)
-    script_name="$(command basename "${0}")"
-    script_dir="$(command cd "$(command dirname "${0}")" && command pwd )"
-    script_path="${script_dir?}/${script_name}"
-    script_params="${*}"
+    currentDir="${PWD}"
 
-    script_logfile="${script_dir}/logs/install.log" # default is '/dev/null'
-    script_loglevel=3  # default is 3
+    scriptParams="${*}"
+    scriptName="$(basename "${0}")"
+    scriptDir="$(cd "$(dirname "${0}")" && pwd )"
+    scriptPath="${scriptDir:?}/${scriptName:?}"
+    scriptHead=$(grep --no-messages --line-number "^#: END" "${0}" \
+        | head -1 \
+        | cut --fields=1 --delimiter=:
+    )
+
+    scriptTempDir=$(mktemp --directory -t tmp.XXXXXXXXXX)
+    scriptTempFile=$(mktemp --directory -t tmp.XXXXXXXXXX)
+
+    scriptLogLevel=3
+    scriptLogFile="${scriptDir}"/logs/script.log
 
     msgInvalid="${scriptName}: invalid option"
     msgTryHelp="Try '${scriptName} --help' for more information."
@@ -260,57 +266,59 @@ function main() {
         esac
     done
 
-    local opts
     while [[ "${#}" -gt 0 ]]; do
         case "${1:-}" in
             -l | --log-file )
-                command shift
-                local file_path="${1:-}"
+                shift
+                local filePath="${1:-}"
                 local filename
                 local directory
 
-                if [[ -z "${file_path}" ]]; then
-                    command printf "%s: missing file operand\n" "${script_name}" >&2
+                if [[ -z "${filePath}" ]]; then
+                    printf "%s: missing file operand\n" "${scriptName}" >&2
                     printf "%s\n" "${msgTryHelp}" >&2
                     exit 1
                 fi
 
-                directory=$(command dirname "${file_path}" 2>/dev/null)
+                directory=$(dirname "${filePath}" 2>/dev/null)
                 if [[ ! "${directory}" =~ ^/ ]]; then
-                    directory="${PWD}/${directory}"
+                    directory="${PWD?}/${directory}"
                 fi
 
                 if [[ ! "${directory}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
-                    command printf "%s: Invalid directory name\n" "${script_name}" >&2
+                    printf "%s: Invalid directory name\n" "${scriptName}" >&2
                     printf "%s\n" "${msgTryHelp}" >&2
                     exit 1
                 fi
 
-                filename=$(command basename "${file_path}")
+                filename=$(basename "${filePath}")
                 if [[ ! "${filename}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
-                    command printf "%s: Invalid filename\n" "${script_name}" >&2
+                    printf "%s: Invalid filename\n" "${scriptName}" >&2
                     printf "%s\n" "${msgTryHelp}" >&2
                     exit 1
                 fi
 
-                if ! has_write_permission "${directory}"; then
-                    command printf "%s: cannot set log directory to \"%s\": Permission denied" "${script_name}" "${directory}" >&2
+                if ! hasWritePermission "${directory}"; then
+                    printf "%s: " "${scriptName}" >&2
+                    printf "cannot set log directory to " >&2
+                    printf "\"%s\"" "${directory}" >&2
+                    printf ": Permission Denied\n" >&2
                     exit 1
                 fi
 
-                command mkdir "${directory}" --parents          \
-                    && command touch "${directory}/${filename}" \
+                mkdir "${directory}" --parents          \
+                    && touch "${directory?}/${filename}" \
 
-                script_logfile="${file_path}"
+                scriptLogFile="${filePath}"
                 ;;
             -L | --log-level )
-                command shift
+                shift
                 if [[ ! "${1:-}" =~ ^(0|1|2|3|4|5)$ ]]; then
-                    command printf "%s: Invalid log level\n" "${script_name}" >&2
+                    printf "%s: Invalid log level\n" "${scriptName}" >&2
                     printf "%s\n" "${msgTryHelp}" >&2
                     exit 1
                 fi
-                script_loglevel="${1}"
+                scriptLogLevel="${1}"
                 ;;
             -o | --option )
                 :
@@ -321,7 +329,7 @@ function main() {
                 exit 1
                 ;;
         esac
-        command shift
+        shift
     done
 
     #TODO Define options logic here
