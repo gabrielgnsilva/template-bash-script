@@ -1,72 +1,80 @@
 #!/bin/bash
 
-#==============================================================================
+#=======================================================================
 # HEADER
-#==============================================================================
-#%
+#=======================================================================
 #% NAME
-#%    Shellscript template
+#%      Script Name - A brief description of your script.
 #%
-#% DESCRIPTION
-#+    This is a shellscript template.
-#+
+#=======================================================================
 #% SYNOPSIS
-#+    ${script_name}: [Options..] [Arguments..]
+#+      ${scriptName} [OPTION]... [ARGUMENT]...
 #+
+#=======================================================================
+#% DESCRIPTION
+#+      A detailed description of your script goes here.
+#+      You can use multiple lines to provide more information.
+#+
+#=======================================================================
 #+ OPTIONS
-#+    -h, --help                    Display help message and exit
+#+      -h, --help          Display this help message and exit
 #%
-#+    -l, --log-file                Custom log file location.
-#%                                  Default is '/dev/null'.
+#+      -v, --version       Display version information and exit
 #%
-#+    -L, --log-level               Change the log level, default is '3'
-#%                                      0 -> Log only CRITICAL messages.
-#%                                      1 -> Log CRITICAL and ERROR messages.
-#%                                      2 -> Log CRITICAL, ERROR and WARNING
-#%                                           messages.
-#%                                      3 -> Log CRITITAL, ERROR, WARNING and
-#%                                           INFO messages.
-#%                                      4 -> Log CRITICAL, ERROR, WARNING,
-#%                                           INFO and DEBUG messages.
-#%                                      5 -> log CRITICAL, ERROR, WARNING,
-#%                                           INFO, DEBUG and TRACE messages.
+#+      -l, --log-file      Custom log file location
 #%
-#+    -o, --option                  Do nothing.
+#+      -L, --log-level     Set the log level for the log file
+#%                          Available options:
+#%                              0 - Critical messages
+#%                              1 - Critical and Error messages
+#%                              2 - All of the above + Warning messages
+#%                              3 - All of the above + Info messages
+#%                              4 - All of the above + Debug messages
+#%                              5 - All of the above + Trace messages
+#%
+#+      -o, --option        Do nothing
 #+
-#+ EXAMPLE
-#+    ${script_name} --help
-#+    ${script_name} -l script.log -L 5 --option
-#%
-#==============================================================================
+#=======================================================================
+#+ EXAMPLES
+#%      Example usages of ${scriptName}.
+#+
+#+      $ ${scriptName} -L 5 -l script.log
+#%          This example shows how to use the script
+#%          with the log level 5 option and output the logs to a file
+#%          named "script.log".
+#+
+#=======================================================================
 #/ IMPLEMENTATION
-#/    Version         ${script_name} 1.0
-#/    Author          Gabriel Nascimento
-#/    Copyright       Copyright (c) Gabriel Nascimento (gnsilva.com)
-#/    License         MIT License
+#-      Version     ${scriptName} 1.0
+#/      Author      Your Name
+#/      Copyright   Copyright (c) Your Name (Website or E-Mail)
+#/      License     MIT License
 #/
-#==============================================================================
+#=======================================================================
 #) COPYRIGHT
-#)    Copyright (c) Gabriel Nascimento. Licence MIT License:
-#)    <https://opensource.org/licenses/MIT>.
+#)      Copyright (c) Year Your Name:
+#)      <https://opensource.org/licenses/MIT>.
 #)
-#)    Permission is hereby granted, free of charge, to any person obtaining a
-#)    copy of this software and associated documentation files (the
-#)    "Software"), to deal in the Software without restriction, including
-#)    without limitation the rights to use, copy, modify, merge, publish,
-#)    distribute, sublicense, and/or sell copies of the Software, and to permit
-#)    persons to whom the Software is furnished to do so, subject to the
-#)    following conditions:
+#)      Permission is hereby granted, free of charge, to any person
+#)      obtaining a copy of this software and associated documentation
+#)      files (the "Software"), to deal in the Software without
+#)      restriction, including without limitation the rights to use,
+#)      copy, modify, merge, publish, distribute, sublicense, and/or
+#)      sell copies of the Software, and to permit persons to whom the
+#)      Software is furnished to do so, subject to the following
+#)      conditions:
 #)
-#)    The above copyright notice and this permission notice shall be included
-#)    in all copies or substantial portions of the Software.
+#)      The above copyright notice and this permission notice shall be
+#)      included in all copies or substantial portions of the Software.
 #)
-#)    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-#)    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-#)    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-#)    NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-#)    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-#)    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-#)    USE OR OTHER DEALINGS IN THE SOFTWARE.
+#)      THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND,
+#)      EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+#)      OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#)      NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+#)      HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+#)      WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+#)      FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+#)      OTHER DEALINGS IN THE SOFTWARE.
 #)
 #==============================================================================
 # UTILS
