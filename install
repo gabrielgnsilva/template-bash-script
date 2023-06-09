@@ -169,7 +169,7 @@ function scriptInit() {
     for util in "${scriptDir}"/utils/_*.sh; do
         source "${util}"
     done
-        }
+}
 
 function trappers() {
 
@@ -178,7 +178,7 @@ function trappers() {
         printf "\nOPTIONS\n%s" "--on  Enable Trappers" >&2
         printf "\n%s\n" "--off Disable Trappers\n" >&2
         exit 1
-        fi
+    fi
 
     if [[ ! "${1:-}" =~ ^(--on|--off)$ ]]; then
         printf "\ntrappers: Invalid argument\n" >&2
