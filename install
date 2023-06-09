@@ -156,6 +156,15 @@ function scriptInit() {
     msgInvalid="${scriptName}: invalid option"
     msgTryHelp="Try '${scriptName} --help' for more information."
 
+    mkdir --parents "$(dirname "${scriptLogFile}")" \
+        || { local exitCode="${?}"
+             printf "\nFailed to create log file: " >&2
+             printf "\"%s\"" "${scriptLogFile}" >&2
+             printf "\nMake sure it is a valid path and " >&2
+             printf "that you have write permission.\n" >&2
+             exit "${exitCode}"
+           }
+
     local util
     for util in "${scriptDir}"/utils/_*.sh; do
         source "${util}"
