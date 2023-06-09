@@ -76,7 +76,7 @@
 #)      FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #)      OTHER DEALINGS IN THE SOFTWARE.
 #)
-#==============================================================================
+#=======================================================================
 # UTILS
 #       Script "utils/_checkDependencies.sh"
 #           Check if a given package exists
@@ -100,42 +100,34 @@
 #       Script "utils/_hasWritePermission.sh"
 #           Check if user has write permission on a given folder
 #
-#    Script "utils/_logger.sh"                Handles logging.
-#
-#    Script "utils/_trapper.sh"               Trap errors, exit and interrupt
-#                                             signals to run some cleanup code.
-#
-#    Script "utils/_validate_arguments.sh"    Used to validate a string or
-#                                             argument.
-#
-#    Script "utils/_write_permission.sh"      Used to check if user has write
-#                                             permission on a given folder.
-#
-#==============================================================================
+#=======================================================================
 # DEBUG OPTIONS
-    set +o xtrace  # Trace the execution of the script (DEBUG)
-    set +o noexec  # Don't execute commands (Ignored by interactive shells)
+    set +o xtrace
+#       Trace the execution of the script (DEBUG)
+
+    set +o noexec
+#       Don't execute commands (Ignored by interactive shells)
 #
-#==============================================================================
+#=======================================================================
 # BASH OPTIONS
-    set   -o nounset     # Exposes unset variables
-    set   -o errexit     # Used to exit upon error, avoiding cascading errors
-    set   -o pipefail    # Unveils hidden failures
-    set   -o noclobber   # Avoid overwriting files (echo "hi" > foo)
-    set   -o errtrace    # Inherit trap on ERR to functions, commands and etc.
-    shopt -s nullglob    # Non-matching globs are removed ('*.foo' => '')
-    shopt -s failglob    # Non-matching globs throw errors
+    set -o nounset  # Exposes unset variables
+    set -o errexit  # Exit upon error, avoiding cascading errors
+    set -o pipefail  # Unveils hidden failures
+    set -o noclobber  # Avoid overwriting files (eg: echo "hi" > foo)
+    set -o errtrace  # Inherit trap on ERR to functions and commands
+    shopt -s nullglob  # Non-matching globs are removed ('*.foo' => '')
+    shopt -s failglob  # Non-matching globs throw errors
     shopt -u nocaseglob  # Case insensitive globs
-    shopt -s dotglob     # Wildcards match hidden files ("*.sh" => ".foo.sh")
-    shopt -s globstar    # Recursive matches ('a/**/*.rb' => 'a/b/c/d.rb')
+    shopt -s dotglob  # Wildcards match hidden files
+    shopt -s globstar  # Recursive matches ('a/**/*.e' => 'a/b/c/d.e')
 #
-#==============================================================================
+#=======================================================================
 # TRAPS
     trap "" SIGTSTP  # Disable CTRL_Z
 #
-#==============================================================================
-# END_OF_HEADER
-#==============================================================================
+#=======================================================================
+#: END_OF_HEADER
+#=======================================================================
 
 # Section: Script Init
 
