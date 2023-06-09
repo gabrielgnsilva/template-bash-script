@@ -147,8 +147,8 @@ function script_init() {
     script_logfile="${script_dir}/logs/install.log" # default is '/dev/null'
     script_loglevel=3  # default is 3
 
-    script_tempdir=$(command mktemp --directory -t tmp.XXXXXXXXXX)
-    script_tempfile=$(command mktemp -t tmp.XXXXXXXXXX)
+    msgInvalid="${scriptName}: invalid option"
+    msgTryHelp="Try '${scriptName} --help' for more information."
 
     local util
     for util in "${scriptDir}"/utils/_*.sh; do
@@ -271,7 +271,7 @@ function main() {
 
                 if [[ -z "${file_path}" ]]; then
                     command printf "%s: missing file operand\n" "${script_name}" >&2
-                    command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                    printf "%s\n" "${msgTryHelp}" >&2
                     exit 1
                 fi
 
@@ -282,14 +282,14 @@ function main() {
 
                 if [[ ! "${directory}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
                     command printf "%s: Invalid directory name\n" "${script_name}" >&2
-                    command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                    printf "%s\n" "${msgTryHelp}" >&2
                     exit 1
                 fi
 
                 filename=$(command basename "${file_path}")
                 if [[ ! "${filename}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
                     command printf "%s: Invalid filename\n" "${script_name}" >&2
-                    command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                    printf "%s\n" "${msgTryHelp}" >&2
                     exit 1
                 fi
 
@@ -307,7 +307,7 @@ function main() {
                 command shift
                 if [[ ! "${1:-}" =~ ^(0|1|2|3|4|5)$ ]]; then
                     command printf "%s: Invalid log level\n" "${script_name}" >&2
-                    command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                    printf "%s\n" "${msgTryHelp}" >&2
                     exit 1
                 fi
                 script_loglevel="${1}"
@@ -316,8 +316,8 @@ function main() {
                 :
                 ;;
             * )
-                command printf "%s: Invalid option \"%s\"\n" "${script_name}" "${1:-}" >&2
-                command printf "Try '%s --help' for more information.\n" "${script_name}" >&2
+                printf "%s \"%s\"\n" "${msgInvalid}" "${1:-}" >&2
+                printf "%s\n" "${msgTryHelp}" >&2
                 exit 1
                 ;;
         esac
