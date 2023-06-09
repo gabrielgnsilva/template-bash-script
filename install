@@ -81,6 +81,8 @@
 #       Script "utils/_checkDependencies.sh"
 #           Check if a given package exists
 #
+#       Script "utils/_create.sh"
+#           Creates a file or a folder, if it does not exist
 #
 #    Script "utils/_check_dependencies.sh"    check for missing dependencies
 #

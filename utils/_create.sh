@@ -1,60 +1,63 @@
 #!/bin/bash
 
-#==============================================================================
+#=======================================================================
 # HEADER
-#==============================================================================
-#
+#=======================================================================
 # NAME
-#    Create
+#       Create
 #
+#=======================================================================
 # SYNOPSIS
-#    create [OPTION] [PATH..]
+#       create [OPTION] [PATH..]
 #
+#=======================================================================
 # DESCRIPTION
-#    This script is designed to be sourced and provides a reusable function
-#    to check if a file or folder exists before creating it, ignoring if true.
+#       This script is designed to be sourced and provides a reusable
+#       function to check if a file or folder exists before creating it,
+#       ignoring if true.
 #
+#=======================================================================
 # OPTIONS
-#    -f, --file                     Create a file along with its
-#                                   parents directory, if not found.
+#       -f, --file          Create a file along with its
+#                           parents directory, if not found
 #
-#    -d, --directory                Create a fodler along with its
-#                                   parents directory, if not found.
+#       -d, --directory     Create a fodler along with its
+#                           parents directory, if not found
 #
+#=======================================================================
 # DEPENDENCIES
-#    Script "utils/_logger.sh"          Handles logging.
-#    Script "utils/_validate_arg.sh"    Handles arguments validation.
-#    Script "utils/_common_utils.sh"    Handles errors and logging
-#                                       on common commands.
+#       Script "utils/_validateArguments.sh"
+#           Handles arguments validation
 #
+#=======================================================================
 # EXAMPLE
 #    create --file "PATH/TO/FILE"
 #    create --directory "PATH/TO/DIRECTORY" "PATH/TO/OTHER/DIRECTORY"
 #
-#==============================================================================
+#=======================================================================
 # END_OF_HEADER
-#==============================================================================
+#=======================================================================
 
 function create(){
 
     if [[ "${#}" -lt 1 ]]; then
-        error "Missing required argument to 'create()' near line ${BASH_LINENO[0]}."
-        error "e.g, $ create --directory PATH/TO/DIR"
-        error "e.g, $ create --file PATH/TO/FILE"
+        printf "create: missing required argument\n" >&2
+        printf "e.g, $ create --directory PATH/TO/DIR\n" >&2
+        printf "e.g, $ create --file PATH/TO/FILE" >&2
         exit 1
     fi
 
-    local create_file
-    local create_directory
+    local createFile
+    local createDirectory
     local paths=()
 
     while [[ "${#}" -gt 0 ]]; do
         case "${1:-}" in
             -f | --file )
-                create_file=1
+                createFile=1
                 ;;
             -d | --directory )
-                create_directory=1
+                createDirectory=1
                 ;;
             * )
                 paths+=( "${1}" )
@@ -63,47 +66,48 @@ function create(){
         shift
     done
 
-    if [[ "${create_file:-}" -eq "${create_directory:-}" ]]; then
-        error "Choose only one operation to use on 'create()' near line ${BASH_LINENO[0]}."
-        error "e.g, $ create --directory PATH/TO/DIR"
-        error "e.g, $ create --file PATH/TO/FILE"
+    if [[ "${createFile:-}" -eq "${createDirectory:-}" ]]; then
+        printf "create: choose only one operation\n" >&2
+        printf "e.g, $ create --directory PATH/TO/DIR\n" >&2
+        printf "e.g, $ create --file PATH/TO/FILE\n" >&2
         exit 1
     fi
 
     if [[ "${#paths[@]}" -eq 0 ]]; then
-        error "Missing required argument to 'create()' near line ${BASH_LINENO[0]}."
-        error "e.g, $ create --directory PATH/TO/DIR"
-        error "e.g, $ create --file PATH/TO/FILE"
+        printf "create: missing required argument\n" >&2
+        printf "e.g, $ create --directory PATH/TO/DIR\n" >&2
+        printf "e.g, $ create --file PATH/TO/FILE\n" >&2
         exit 1
     fi
 
-    validate_arguments "${paths[@]}" --if-empty --special-chars
+    validateArguments "${paths[@]}" --if-empty --special-chars
 
     local i
     for i in "${paths[@]}"; do
-        if [[ "${create_file:-}" == 1 ]]; then
+        if [[ "${createFile:-}" == 1 ]]; then
 
             if [[ -f "${i}" ]]; then
-                debug "Skipping file '${i}' at line number ${BASH_LINENO[0]}, already found."
+                printf "create: skipping file '%s': already found\n" "${i}"
                 continue
             fi
 
-            do_mkdir --parents "$(dirname "${i}")" \
-                && do_touch "${i}"
+            mkdir --parents "$(dirname "${i}")" \
+                && touch "${i}"
 
-            debug "Created file '${i}', line ${BASH_LINENO[0]}"
+            printf "create: Created file '%s'\n" "${i}"
         fi
 
-        if [[ "${create_directory:-}" == 1 ]]; then
+        if [[ "${createDirectory:-}" == 1 ]]; then
 
             if [[ -d "${i}" ]]; then
-                debug "Skipping directory '${i}' at line number ${BASH_LINENO[0]}, already found."
+                printf "create: skipping directory "
+                printf "'%s': already found.\n" "${i}"
                 continue
             fi
 
-            do_mkdir --parents "${i}"
+            mkdir --parents "${i}"
 
-            debug "Created directory '${i}', line ${BASH_LINENO[0]}"
+            printf "Created directory '%s'\n" "${i}"
         fi
     done
 }
