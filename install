@@ -91,8 +91,8 @@
 #           Handles the help messages, either full or usage,
 #           from the info on this header
 #
-#    Script "utils/_create.sh"                Creates a file or a folder,
-#                                             if it does not exist.
+#       Script "utils/_logFile.sh"
+#           Handles logging
 #
 #       Script "utils/_validateArguments.sh"
 #           Used to validate a string or argument
@@ -338,16 +338,19 @@ function main() {
     # The trapper must be enabled after the initial setup.
     trappers --on
 
-    trace "Origin cwd: '${current_dir}'."
-    trace "Header size: ${script_head}."
-    trace "Script name: '${script_name}'."
-    trace "Script directory: '${script_dir}'."
-    trace "Script path: '${script_path}'."
-    trace "Script param: '${script_params}'."
-    trace "Script log file: '${script_logfile}'."
-    trace "Script log level: ${script_loglevel}."
-    trace "Temporary directory: '${script_tempdir}'."
-    trace "Temporary file: '${script_tempfile}'."
+    # From this point on, it should be safe to use the logFile
+    logFile --type=trace "Origin cwd: '${currentDir}'."
+    logFile --type=trace "Header size: ${scriptHead}."
+    logFile --type=trace "Script's name: '${scriptName}'."
+    logFile --type=trace "Script's directory: '${scriptDir}'."
+    logFile --type=trace "Script's path: '${scriptPath}'."
+    logFile --type=trace "Script's param: '${scriptParams}'."
+    logFile --type=trace "Script's log file: '${scriptLogFile}'."
+    logFile --type=trace "Script's log level: ${scriptLogLevel}."
+    logFile --type=trace "Temporary directory: '${scriptTempDir}'."
+    logFile --type=trace "Temporary file: '${scriptTempFile}'."
+
+    cd "${scriptDir}" || exit 1
 
     #TODO Define script logic from here
     # ...
