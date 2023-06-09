@@ -97,9 +97,8 @@
 #    Script "utils/_do_countdown.sh"          Perform a countdown for the
 #                                             specified number of seconds
 #
-#    Script "utils/_helper.sh"                Handles the help messages, either
-#                                             full or usage, from the info
-#                                             on this header.
+#       Script "utils/_hasWritePermission.sh"
+#           Check if user has write permission on a given folder
 #
 #    Script "utils/_logger.sh"                Handles logging.
 #
