@@ -131,7 +131,7 @@
 #
 #==============================================================================
 # TRAPS
-    # Handled by script "utils/_trapper.sh".
+    trap "" SIGTSTP  # Disable CTRL_Z
 #
 #==============================================================================
 # END_OF_HEADER
@@ -169,7 +169,48 @@ function script_init() {
         if  [[ ! "$(command basename "${file}")" == "_trapper.sh" ]] ; then
             source "${file}"
         fi
-    done
+function ctrlC() {
+
+    trappers --off  # Disable trappers to prevent recursion
+
+    { printf "Interrupt signal intercepted! Exiting now...\n"
+    } >> "${scriptLogFile}" 2>&1
+
+    exit 130
+}
+
+function errTrapper() {
+
+    local exitCode="${?}"
+
+    trappers --off  # Disable trappers to prevent recursion
+
+    { printf "An exception ocurred near line: %s\n" "${BASH_LINENO[0]}"
+      printf "Script Parameters: '%s'\n" "${scriptParams}"
+    } >> "${scriptLogFile}" 2>&1
+
+    exit "${exitCode}"
+}
+
+function exitTrapper {
+
+    local exitCode="${?}"
+    local exitTime
+
+    trappers --off  # Disable trappers to prevent recursion
+
+    rm --recursive --force \
+        "${scriptTempDir}" \
+        "${scriptTempFile}"
+
+    cd "${currentDir}"
+
+    exitTime="$(date +"%Y/%m/%d %H:%M:%S")"
+    { printf "[%s] [-]: Script terminated with exit status: " "${exitTime}"
+      printf "%s\n" "${exitCode:-1}"
+    } >> "${scriptLogFile}" 2>&1
+
+    exit "${exitCode:-1}"
 }
 
 # Section: Script Functions
