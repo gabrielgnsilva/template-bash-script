@@ -367,5 +367,6 @@ function main() {
 
 # Invoke main with args only if not sourced
 if ! (return 0 2> /dev/null); then
+    scriptInit "${@}"
     main "${@}"
 fi
