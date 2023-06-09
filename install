@@ -335,8 +335,8 @@ function main() {
     #TODO Define options logic here
     # ...
 
-    source "${script_dir}"/utils/_trapper.sh
-    do_cd "${script_dir}"
+    # The trapper must be enabled after the initial setup.
+    trappers --on
 
     trace "Origin cwd: '${current_dir}'."
     trace "Header size: ${script_head}."
