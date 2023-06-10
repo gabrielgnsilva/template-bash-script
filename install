@@ -151,11 +151,6 @@ function scriptInit() {
              printf "that you have write permission.\n" >&2
              exit "${exitCode}"
            }
-
-    local util
-    for util in "${scriptDir}"/utils/_*.sh; do
-        source "${util}"
-    done
 }
 
 function trappers() {
@@ -209,7 +204,12 @@ function errTrapper() {
       printf "Script Parameters: '%s'\n" "${scriptParams}"
     } >> "${scriptLogFile}" 2>&1
 
-    exit "${exitCode}"
+# shellcheck disable=1090
+function _initUtils() {
+    local script
+    for script in "${scriptDir}"/utils/_*.sh; do
+        source "${script}"
+    done
 }
 
 function exitTrapper {
@@ -282,6 +282,5 @@ function main() {
 
 # Invoke main with args only if not sourced
 if ! (return 0 2> /dev/null); then
-    scriptInit "${@}"
-    main "${@}"
+    _initUtils
 fi
