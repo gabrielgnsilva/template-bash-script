@@ -40,13 +40,8 @@ function _displayHelp() {
     local filter
 
     case "${helpOption}" in
-        "usage"   ) filter="^#+[ ]*"   ;;
-        "version" ) filter="^#-[ ]*"   ;;
-        "full"    ) filter="^#[%/)+-]" ;;
-    esac
-
-    case "${helpOption}" in
         version )
+            filter="^#-[ ]*"
             head -"${scriptHead:-99}" "${0}"           \
                 | grep --regexp="${filter}"            \
                 | sed --expression="s/${filter}//g"    \
@@ -55,6 +50,7 @@ function _displayHelp() {
                     --expression="s/ //g"
             ;;
         usage )
+            filter="^#+[ ]*"
             head -"${scriptHead:-99}" "${0}"                                  \
                 | grep --regexp="${filter}"                                   \
                 | sed --expression="s/${filter}//g"                           \
@@ -62,6 +58,7 @@ function _displayHelp() {
                     --expression="s/\${scriptName}/${scriptName}/g"
         ;;
         * )
+            filter="^#[%/)+-]"
             head -"${scriptHead:-99}" "${0}"                        \
                 | grep --regexp="${filter}"                         \
                 | sed --expression="s/${filter}//g"                 \
