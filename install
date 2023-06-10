@@ -136,7 +136,7 @@ function scriptInit() {
     )
 
     scriptTempDir=$(mktemp --directory -t tmp.XXXXXXXXXX)
-    scriptTempFile=$(mktemp --directory -t tmp.XXXXXXXXXX)
+    scriptTempFile=$(mktemp -t tmp.XXXXXXXXXX)
 
     scriptLogFile="${scriptDir}"/logs/script.log
     mkdir --parents "$(dirname "${scriptLogFile}")" \
