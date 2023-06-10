@@ -22,7 +22,8 @@
 #+      -v, --version       Display version information and exit
 #%
 #+      -l, --log-file      Custom log file location
-#%
+#%                          Regex: ^[a-zA-Z0-9_/\.-]+$
+
 #+      -L, --log-level     Set the log level for the log file
 #%                          Available options:
 #%                              0 - Critical messages
