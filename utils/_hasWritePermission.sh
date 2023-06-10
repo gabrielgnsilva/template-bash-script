@@ -30,17 +30,6 @@
 # END_OF_HEADER
 #=======================================================================
 
-_checkWritePermission() {
-
-    local dir="${1}"
-
-    if [[ ! -w "${dir}" ]]; then
-        return 1
-    else
-        return 0
-    fi
-}
-
 hasWritePermission() {
 
     if [[ "${#}" -ne 1 ]]; then
@@ -53,12 +42,11 @@ hasWritePermission() {
     local parentDir
 
     while true; do
-        if _checkWritePermission "${dir}"; then
+        if [[ -w "${dir}" ]]; then
             return 0
         fi
 
         parentDir=$(dirname "${dir}")
-
         if [[ "${parentDir}" == "${dir}" ]]; then
             return 1
         fi
