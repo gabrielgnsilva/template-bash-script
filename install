@@ -139,10 +139,6 @@ function scriptInit() {
     scriptTempFile=$(mktemp --directory -t tmp.XXXXXXXXXX)
 
     scriptLogFile="${scriptDir}"/logs/script.log
-
-    msgInvalid="${scriptName}: invalid option"
-    msgTryHelp="Try '${scriptName} --help' for more information."
-
     mkdir --parents "$(dirname "${scriptLogFile}")" \
         || { local exitCode="${?}"
              printf "\nFailed to create log file on default directory: " >&2
@@ -151,6 +147,9 @@ function scriptInit() {
              printf "that you have write permission.\n" >&2
              exit "${exitCode}"
            }
+
+    msgInvalid="${scriptName}: invalid option"
+    msgTryHelp="Try '${scriptName} --help' for more information."
 }
 
 function trappers() {
