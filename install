@@ -117,7 +117,7 @@
 #: END_OF_HEADER
 #=======================================================================
 
-# Section: Script Init
+# Section: Script Initialization
 
 # shellcheck disable=1090
 function scriptInit() {
