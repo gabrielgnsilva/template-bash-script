@@ -152,84 +152,12 @@ function _initVariables() {
     msgTryHelp="Try '${scriptName} --help' for more information."
 }
 
-function trappers() {
-
-    if [[ "${#}" -lt 1 ]]; then
-        printf "trappers: missing argument\n" >&2
-        printf "\nOPTIONS\n%s" "--on  Enable Trappers" >&2
-        printf "\n%s\n" "--off Disable Trappers\n" >&2
-        exit 1
-    fi
-
-    if [[ ! "${1:-}" =~ ^(--on|--off)$ ]]; then
-        printf "\ntrappers: Invalid argument\n" >&2
-        printf "\nOPTIONS\n%s" "--on  Enable Trappers" >&2
-        printf "\n%s\n" "--off Disable Trappers\n" >&2
-        exit 1
-    fi
-
-    local status="${1:-}"
-    case "${status}" in
-        --on )
-            trap ctrlC INT  # Trap CTRL_C and call ctrlC
-            trap errTrapper ERR  # Trap ERR and call errTrapper
-            trap exitTrapper EXIT  # Trap EXIT on exitTrapper
-            ;;
-        --off )
-            trap "" INT  # Disable trap on CTRL_C
-            trap "" ERR  # Disable trap on ERR
-            trap "" EXIT  # Disable trap on EXIT
-            ;;
-    esac
-}
-
-function ctrlC() {
-
-    trappers --off  # Disable trappers to prevent recursion
-
-    { printf "Interrupt signal intercepted! Exiting now...\n"
-    } >> "${scriptLogFile}" 2>&1
-
-    exit 130
-}
-
-function errTrapper() {
-
-    local exitCode="${?}"
-
-    trappers --off  # Disable trappers to prevent recursion
-
-    { printf "An exception ocurred near line: %s\n" "${BASH_LINENO[0]}"
-      printf "Script Parameters: '%s'\n" "${scriptParams}"
-    } >> "${scriptLogFile}" 2>&1
-
 # shellcheck disable=1090
 function _initUtils() {
     local script
     for script in "${scriptDir}"/utils/_*.sh; do
         source "${script}"
     done
-}
-
-function exitTrapper {
-
-    local exitCode="${?}"
-    local exitTime
-
-    trappers --off  # Disable trappers to prevent recursion
-
-    rm --recursive --force \
-        "${scriptTempDir}" \
-        "${scriptTempFile}"
-
-    cd "${currentDir}"
-
-    exitTime="$(date +"%Y/%m/%d %H:%M:%S")"
-    { printf "[%s] [-]: Script terminated with exit status: " "${exitTime}"
-      printf "%s\n" "${exitCode:-1}"
-    } >> "${scriptLogFile}" 2>&1
-
-    exit "${exitCode:-1}"
 }
 
 # Section: Script Functions
