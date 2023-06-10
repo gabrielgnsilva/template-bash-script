@@ -126,7 +126,7 @@ function _initVariables() {
 
     currentDir="${PWD}"
 
-    scriptParams="${*}"
+    scriptParams=( "${@}" )
     scriptName="$(basename "${0}")"
     scriptDir="$(cd "$(dirname "${0}")" && pwd )"
     scriptPath="${scriptDir:?}/${scriptName:?}"
@@ -168,7 +168,7 @@ function _initUtils() {
 # Section: Main Program
 
 # shellcheck disable=SC1091
-function main() {
+function _main() {
 
     if [[ "${#}" -lt 1 ]]; then
         displayHelpUsage
@@ -215,4 +215,5 @@ function main() {
 if ! (return 0 2> /dev/null); then
     _initVariables "${@}"
     _initUtils
+    _main "${scriptParams[@]}"
 fi
