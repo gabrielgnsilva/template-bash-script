@@ -145,7 +145,7 @@ function scriptInit() {
 
     mkdir --parents "$(dirname "${scriptLogFile}")" \
         || { local exitCode="${?}"
-             printf "\nFailed to create log file: " >&2
+             printf "\nFailed to create log file on default directory: " >&2
              printf "\"%s\"" "${scriptLogFile}" >&2
              printf "\nMake sure it is a valid path and " >&2
              printf "that you have write permission.\n" >&2
