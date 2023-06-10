@@ -120,7 +120,7 @@
 # Section: Script Initialization
 
 # shellcheck disable=1090
-function scriptInit() {
+function _initVariables() {
 
     IFS=$' \t\n'
 
@@ -285,5 +285,6 @@ function main() {
 
 # Invoke main with args only if not sourced
 if ! (return 0 2> /dev/null); then
+    _initVariables "${@}"
     _initUtils
 fi
