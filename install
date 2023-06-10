@@ -264,6 +264,7 @@ function main() {
     #TODO Define options logic here
     # ...
 
+    cd "${scriptDir}" || exit 1
     while [[ "${#}" -gt 0 ]]; do
         case "${1:-}" in
             -o | --option )
