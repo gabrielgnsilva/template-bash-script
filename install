@@ -88,6 +88,21 @@
 #       Script "utils/_hasWritePermission.sh"
 #           Check if user has write permission on a given folder
 #
+#        Trap "DEBUG"
+#           This script uses a trap on DEBUG when _initLogger is called,
+#           which prints the output of all commands to a log file, and
+#           by default it also does not print stderr and stdout
+#           on the terminal, unless explicitly told to.
+#
+#           If you need to print a text on the terminal, redirect the
+#           output do FD3 (eg: command >&3) or use the function
+#           "println [MESSAGE]...", which redirects printf to FD3.
+#
+#           You can use the function "log [MESSAGE]..." to ouput a
+#           formated log message, prefixed with "+++" and the line
+#           number to the log file. Otherwise, use echo or printf
+#           command without a FD set.
+#
 #=======================================================================
 # DEBUG OPTIONS
     set +o xtrace
@@ -160,6 +175,119 @@ function _initUtils() {
     done
 }
 
+function _initLogger() {
+    local filePath
+    local filename
+    local directory
+    local parentDir
+    local dir
+    local argUsed=false
+    local valuesToRemove=()
+    local filteredParams=()
+
+    while [[ "${#}" -gt 0 ]]; do
+        case "${1:-}" in
+            -l | --log-file )
+                if [[ "${argUsed}" == true ]]; then
+                    printf "%s: too much arguments\n" "${scriptName}" >&2
+                    printf "%s\n" "${msgTryHelp}" >&2
+                    exit 1
+                fi
+                shift
+
+                filePath="${1:-}"
+                if [[ -z "${filePath}" ]]; then
+                    printf "%s: missing file operand\n" "${scriptName}" >&2
+                    printf "%s\n" "${msgTryHelp}" >&2
+                    exit 1
+                fi
+
+                directory=$(dirname "${filePath}" 2>/dev/null)
+                if [[ ! "${directory}" =~ ^/ ]]; then
+                    directory="${PWD?}/${directory}"
+                fi
+
+                filename=$(basename "${filePath}")
+                if [[ ! "${directory}" =~ ^[a-zA-Z0-9_/\.-]+$          \
+                    || ! "${filename}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
+
+                    printf "%s: Invalid file or directory name\n" \
+                        "${scriptName}" >&2
+                    printf "%s\n" "${msgTryHelp}" >&2
+                    exit 1
+                fi
+
+                dir="${directory}"
+                while true; do
+                    if [[ -w "${dir}" ]]; then
+                        break
+                    fi
+
+                    parentDir=$(dirname "${dir}")
+                    if [[ "${parentDir}" == "${dir}" ]]; then
+                        printf "%s: " "${scriptName}" >&2
+                        printf "cannot set log directory to " >&2
+                        printf "\"%s\"" "${directory}" >&2
+                        printf ": Permission Denied\n" >&2
+                        exit 1
+                    fi
+
+                    dir="${parentDir}"
+                done
+
+                mkdir "${directory}" --parents            \
+                    && touch "${directory:?}/${filename}" \
+
+                scriptLogFile="${filePath}"
+                argUsed=true
+
+                valuesToRemove=( "-l" "--log-file" "${filePath}" )
+                for element in "${scriptParams[@]}"; do
+                    # Check if the element is in the list of values to remove
+                    if [[ ! "${valuesToRemove[*]}" == *"${element}"* ]]; then
+                        filteredParams+=("$element")
+                    fi
+                done
+                scriptParams=( "${filteredParams[@]}" )
+                ;;
+            * )
+                :
+                ;;
+        esac
+        shift
+    done
+
+    cp /dev/null "${scriptLogFile}"
+    exec 3>&1 1>>"${scriptLogFile}" 2>&1
+}
+
+function _traceVariables() {
+
+    log "Origin cwd: ${currentDir}"
+    log "Script parameter: ${scriptParams[*]}"
+    log "Script name: ${scriptName}"
+    log "Script directory: ${scriptDir}"
+    log "Script path: ${scriptPath}"
+    log "Script head size: ${scriptHead}"
+    log "Script temp directory: ${scriptTempDir}"
+    log "Script temp file: ${scriptTempFile}"
+    log "Script log file: ${scriptLogFile}"
+    log "Message invalid: ${msgInvalid}"
+    log "Message try help: ${msgTryHelp}"
+}
+
+# Section: Script Helper Functions
+
+function log() {
+
+    command printf "+++ (%s): %s\n" "${BASH_LINENO[0]}" "${*}"
+}
+
+function println() {
+
+    command printf %s\\n "${*}" >&3
+}
+
 # Section: Script Functions
 
 #TODO Define script functions here
@@ -171,7 +299,7 @@ function _initUtils() {
 function _main() {
 
     if [[ "${#}" -lt 1 ]]; then
-        displayHelpUsage
+        displayHelpUsage >&3
         exit 0
     fi
 
@@ -179,11 +307,11 @@ function _main() {
     for i in "${@}"; do
         case "${i}" in
             -h | --help | help )
-                displayFullHelp
+                displayFullHelp >&3
                 exit 0
                 ;;
             -v | --version | version )
-                displayVersion
+                displayVersion >&3
                 exit 0
                 ;;
         esac
@@ -199,8 +327,8 @@ function _main() {
                 :
                 ;;
             * )
-                printf "%s \"%s\"\n" "${msgInvalid}" "${1:-}" >&2
-                printf "%s\n" "${msgTryHelp}" >&2
+                println "${msgInvalid} \"${1:-}\""
+                println "${msgTryHelp}"
                 exit 1
                 ;;
         esac
@@ -214,6 +342,8 @@ function _main() {
 # Invoke main with args only if not sourced
 if ! (return 0 2> /dev/null); then
     _initVariables "${@}"
+    _initLogger "${@}"
     _initUtils
+    _traceVariables "${@}"
     _main "${scriptParams[@]}"
 fi
