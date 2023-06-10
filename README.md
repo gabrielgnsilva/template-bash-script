@@ -5,7 +5,7 @@ This is a template for a shell script.
 ## Synopsis
 
 ```bash
-"${script_name}" [Options..] [Arguments..]
+./install [OPTION]... [ARGUMENT]...
 ```
 
 ## Options
@@ -24,8 +24,8 @@ This is a template for a shell script.
 ## Example
 
 ```bash
-"${script_name}" --help
-"${script_name}" -l script.log -L 5 --option
+./install --help
+./install -l script.log --option
 ```
 
 ## Utils
