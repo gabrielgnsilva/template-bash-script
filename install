@@ -23,15 +23,6 @@
 #%
 #+      -l, --log-file      Custom log file location
 #%                          Regex: ^[a-zA-Z0-9_/\.-]+$
-
-#+      -L, --log-level     Set the log level for the log file
-#%                          Available options:
-#%                              0 - Critical messages
-#%                              1 - Critical and Error messages
-#%                              2 - All of the above + Warning messages
-#%                              3 - All of the above + Info messages
-#%                              4 - All of the above + Debug messages
-#%                              5 - All of the above + Trace messages
 #%
 #+      -o, --option        Do nothing
 #+
@@ -39,10 +30,9 @@
 #+ EXAMPLES
 #%      Example usages of ${scriptName}.
 #+
-#+      $ ${scriptName} -L 5 -l script.log
-#%          This example shows how to use the script
-#%          with the log level 5 option and output the logs to a file
-#%          named "script.log".
+#+      $ ${scriptName} -l script.log -o
+#%          This example shows how to use the script with the log file
+#%          set to "script.log", and -o option, that does nothing.
 #+
 #=======================================================================
 #/ IMPLEMENTATION
@@ -91,9 +81,6 @@
 #       Script "utils/_displayHelp.sh"
 #           Handles the help messages, either full or usage,
 #           from the info on this header
-#
-#       Script "utils/_logFile.sh"
-#           Handles logging
 #
 #       Script "utils/_validateArguments.sh"
 #           Used to validate a string or argument
@@ -151,7 +138,6 @@ function scriptInit() {
     scriptTempDir=$(mktemp --directory -t tmp.XXXXXXXXXX)
     scriptTempFile=$(mktemp --directory -t tmp.XXXXXXXXXX)
 
-    scriptLogLevel=3
     scriptLogFile="${scriptDir}"/logs/script.log
 
     msgInvalid="${scriptName}: invalid option"
@@ -278,58 +264,6 @@ function main() {
 
     while [[ "${#}" -gt 0 ]]; do
         case "${1:-}" in
-            -l | --log-file )
-                shift
-                local filePath="${1:-}"
-                local filename
-                local directory
-
-                if [[ -z "${filePath}" ]]; then
-                    printf "%s: missing file operand\n" "${scriptName}" >&2
-                    printf "%s\n" "${msgTryHelp}" >&2
-                    exit 1
-                fi
-
-                directory=$(dirname "${filePath}" 2>/dev/null)
-                if [[ ! "${directory}" =~ ^/ ]]; then
-                    directory="${PWD?}/${directory}"
-                fi
-
-                if [[ ! "${directory}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
-                    printf "%s: Invalid directory name\n" "${scriptName}" >&2
-                    printf "%s\n" "${msgTryHelp}" >&2
-                    exit 1
-                fi
-
-                filename=$(basename "${filePath}")
-                if [[ ! "${filename}" =~ ^[a-zA-Z0-9_/\.-]+$ ]]; then
-                    printf "%s: Invalid filename\n" "${scriptName}" >&2
-                    printf "%s\n" "${msgTryHelp}" >&2
-                    exit 1
-                fi
-
-                if ! hasWritePermission "${directory}"; then
-                    printf "%s: " "${scriptName}" >&2
-                    printf "cannot set log directory to " >&2
-                    printf "\"%s\"" "${directory}" >&2
-                    printf ": Permission Denied\n" >&2
-                    exit 1
-                fi
-
-                mkdir "${directory}" --parents          \
-                    && touch "${directory?}/${filename}" \
-
-                scriptLogFile="${filePath}"
-                ;;
-            -L | --log-level )
-                shift
-                if [[ ! "${1:-}" =~ ^(0|1|2|3|4|5)$ ]]; then
-                    printf "%s: Invalid log level\n" "${scriptName}" >&2
-                    printf "%s\n" "${msgTryHelp}" >&2
-                    exit 1
-                fi
-                scriptLogLevel="${1}"
-                ;;
             -o | --option )
                 :
                 ;;
@@ -343,26 +277,6 @@ function main() {
     done
 
     #TODO Define options logic here
-    # ...
-
-    # The trapper must be enabled after the initial setup.
-    trappers --on
-
-    # From this point on, it should be safe to use the logFile
-    logFile --type=trace "Origin cwd: '${currentDir}'."
-    logFile --type=trace "Header size: ${scriptHead}."
-    logFile --type=trace "Script's name: '${scriptName}'."
-    logFile --type=trace "Script's directory: '${scriptDir}'."
-    logFile --type=trace "Script's path: '${scriptPath}'."
-    logFile --type=trace "Script's param: '${scriptParams}'."
-    logFile --type=trace "Script's log file: '${scriptLogFile}'."
-    logFile --type=trace "Script's log level: ${scriptLogLevel}."
-    logFile --type=trace "Temporary directory: '${scriptTempDir}'."
-    logFile --type=trace "Temporary file: '${scriptTempFile}'."
-
-    cd "${scriptDir}" || exit 1
-
-    #TODO Define script logic from here
     # ...
 }
 
