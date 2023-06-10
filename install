@@ -261,6 +261,9 @@ function main() {
         esac
     done
 
+    #TODO Define options logic here
+    # ...
+
     while [[ "${#}" -gt 0 ]]; do
         case "${1:-}" in
             -o | --option )
@@ -275,7 +278,7 @@ function main() {
         shift
     done
 
-    #TODO Define options logic here
+    #TODO Define script logic from here
     # ...
 }
 
