@@ -26,6 +26,51 @@ This is a template for a shell script.
 ./install -l script.log --option
 ```
 
+## Logging
+
+This script uses a trap on DEBUG when _initLogger is called,
+which prints the output of all commands to a log file, and
+by default it also does not print stderr and stdout
+on the terminal, unless explicitly told to.
+
+If you need to print a text on the terminal, redirect the
+output do FD3:
+
+```bash
+#!/bin/bash
+
+command >&3
+```
+
+or use the function "println", which redirects printf to FD3:
+
+```bash
+#!/bin/bash
+
+function println() {
+
+  command printf %s\\n "${*}" >&3
+}
+
+println "Output to the terminal"
+```
+
+You can use the function "log" to ouput a formated log
+message, prefixed with "+++" and the line number to the
+log file. Otherwise, use echo or printf command without a
+FD set.
+
+```bash
+#!/bin/bash
+
+function log() {
+
+  command printf "+++ (%s): %s\n" "${BASH_LINENO[0]}" "${*}"
+}
+
+log "Output to the log file"
+```
+
 ## Utils
 
 - Script "utils/_checkDependencies.sh": Check for missing dependencies.
