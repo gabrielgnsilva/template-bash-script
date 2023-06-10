@@ -126,7 +126,52 @@
 #
 #=======================================================================
 # TRAPS
-    trap "" SIGTSTP  # Disable CTRL_Z
+    function _setTraps() {
+
+        trap '{ set +o xtrace; } 2>/dev/null                     \
+            ; PS4="+ [$(date +"%d/%m/%Y %H:%M:%S")] ${LINENO}: " \
+            ; set -o xtrace' DEBUG
+
+        trap "" SIGTSTP
+        trap _exitTrap EXIT
+        trap _ctrlC INT
+        trap _errTrapper ERR
+    }
+
+    function _ctrlC() {
+        trap "" INT  # Disable trap on CTRL_C to prevent recursion
+
+        println "Interrupt signal intercepted! Exiting now...\n"
+        exit 130
+    }
+
+    function _errTrapper() {
+
+        local exitCode="${?}"
+
+        trap "" ERR  # Disable trap on ERR to prevent recursion
+
+        println "${scriptName}: An exception occurred during execution"
+        println "Check the log file \"${scriptLogFile}\" for details."
+
+        exit "${exitCode:-1}"
+    }
+
+    function _exitTrap() {
+
+        local exitCode="${?}"
+
+        trap "" EXIT  # Disable trap on EXIT to prevent recursion
+
+        rm --recursive --force  \
+            "${scriptTempDir}"  \
+            "${scriptTempFile}"
+
+        cd "${currentDir}"
+
+        log "Script Terminated with exit status: ${exitCode:-1}"
+        exit "${exitCode:-1}"
+    }
 #
 #=======================================================================
 #: END_OF_HEADER
@@ -344,6 +389,7 @@ if ! (return 0 2> /dev/null); then
     _initVariables "${@}"
     _initLogger "${@}"
     _initUtils
+    _setTraps
     _traceVariables "${@}"
     _main "${scriptParams[@]}"
 fi
