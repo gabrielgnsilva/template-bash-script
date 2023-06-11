@@ -49,7 +49,7 @@ or use the function "println", which redirects printf to FD3:
 
 function println() {
 
-  command printf %s\\n "${*}" >&3
+  command printf "%b\n" "${*}" >&3
 }
 
 println "Output to the terminal"
@@ -65,7 +65,7 @@ FD set.
 
 function log() {
 
-  command printf "+++ (%s): %s\n" "${BASH_LINENO[0]}" "${*}"
+  command printf "+++ (%s): %b\n" "${BASH_LINENO[0]}" "${*}"
 }
 
 log "Output to the log file"

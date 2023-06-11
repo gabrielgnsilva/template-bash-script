@@ -141,7 +141,7 @@
     function _ctrlC() {
         trap "" INT  # Disable trap on CTRL_C to prevent recursion
 
-        println "Interrupt signal intercepted! Exiting now...\n"
+        println "\nInterrupt signal intercepted! Exiting now..."
         exit 130
     }
 
@@ -325,12 +325,16 @@ function _traceVariables() {
 
 function log() {
 
-    command printf "+++ (%s): %s\n" "${BASH_LINENO[0]}" "${*}"
+    command printf "+++ (%s): %b\n" "${BASH_LINENO[0]}" "${*}"
 }
 
 function println() {
 
-    command printf %s\\n "${*}" >&3
+    command printf "%b\n" "${*}" >&3
+}
+
+function prompt() {
+    command printf "%s" "${*}" >&3
 }
 
 # Section: Script Functions
