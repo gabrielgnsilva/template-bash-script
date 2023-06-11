@@ -28,21 +28,21 @@ This is a template for a shell script.
 
 ## Logging
 
-This script uses a trap on DEBUG when _initLogger is called,
-which prints the output of all commands to a log file, and
-by default it also does not print stderr and stdout
-on the terminal, unless explicitly told to.
+This script uses a DEBUG trap when "_initLogger" is called, which prints the output of all commands to a log file, and by default it also does not print stderr and stdout on the terminal, unless explicitly told to.
 
-If you need to print a text on the terminal, redirect the
-output do FD3:
+To print command output on the terminal, redirect the output to FD3:
 
 ```bash
 #!/bin/bash
 
 command >&3
+
+# Some commands like package managers output to both stdout and stderr and may ask for user input. In this case, redirect both FD1 and FD2 to FD3, otherwise the user will not be aware of the command asking for input.
+
+command >&3 2>&3
 ```
 
-or use the function "println", which redirects printf to FD3:
+If you need to display a text on the terminal, you can use the function "println", which redirects printf to FD3, thus making it easier to type and distinguish which text get shown to the user:
 
 ```bash
 #!/bin/bash
@@ -55,10 +55,7 @@ function println() {
 println "Output to the terminal"
 ```
 
-You can use the function "log" to ouput a formated log
-message, prefixed with "+++" and the line number to the
-log file. Otherwise, use echo or printf command without a
-FD set.
+You can use the function "log" to ouput a formated log message, prefixed with "+++" and the line number to the log file:
 
 ```bash
 #!/bin/bash
@@ -69,6 +66,32 @@ function log() {
 }
 
 log "Output to the log file"
+```
+
+Otherwise, use echo or printf command without a FD set.
+
+## Prompting
+
+When presenting a user or a system with a specific message, question, or request in order to elicit a response or input, make sure to also redirect the message to FD3, otherwise the prompt message will not output to the user:
+
+```bash
+#!/bin/bash
+
+read -r -p "Input: " ans 2>&3
+
+read -r -p "$(printf "Input: " >&3)" ans
+```
+
+If you need to request input from the user, you can use the function "prompt", which redirects printf to FD3, thus making it easier to redirect multiple prompts:
+
+```bash
+#!/bin/bash
+
+function prompt() {
+  command printf "%s" "${*}" >&3
+}
+
+read -r -p "$(prompt "Input: ")" ans
 ```
 
 ## Utils
