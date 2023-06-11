@@ -37,7 +37,10 @@ To print command output on the terminal, redirect the output to FD3:
 
 command >&3
 
-# Some commands like package managers output to both stdout and stderr and may ask for user input. In this case, redirect both FD1 and FD2 to FD3, otherwise the user will not be aware of the command asking for input.
+# Some commands like package managers output to both stdout and stderr
+# and may ask for user input. In this case, redirect both FD1 and FD2
+# to FD3, otherwise the user will not be aware of the command asking
+# for input.
 
 command >&3 2>&3
 ```
