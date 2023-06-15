@@ -309,7 +309,7 @@ function _initLogger() {
                 for element in "${scriptParams[@]}"; do
                     # Check if the element is in the list of values to remove
                     if [[ ! "${valuesToRemove[*]}" == *"${element}"* ]]; then
-                        filteredParams+=("$element")
+                        filteredParams+=("${element}")
                     fi
                 done
                 scriptParams=( "${filteredParams[@]}" )
