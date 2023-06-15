@@ -38,32 +38,46 @@ function _displayHelp() {
 
     local helpOption="${1}"
     local filter
+    local header
+    local filterheader
+    local formatheader
 
+
+    header="$(head -"${scriptHead:-99}" "${0}")"
     case "${helpOption}" in
         version )
             filter="^#-[ ]*"
-            head -"${scriptHead:-99}" "${0}"           \
-                | grep --regexp="${filter}"            \
+            filterheader="$(echo "${header}" | grep --regexp="${filter}")"
+            formatheader="$(echo "${filterheader}"     \
                 | sed --expression="s/${filter}//g"    \
                     --expression="s/\${scriptName}//g" \
                     --expression="s/Version//g"        \
-                    --expression="s/ //g" || :
+                    --expression="s/ //g"
+            )"
+
+            printf "%b\n" "${formatheader}"
             ;;
         usage )
             filter="^#+[ ]*"
-            head -"${scriptHead:-99}" "${0}"                                  \
-                | grep --regexp="${filter}"                                   \
+            filterheader="$(echo "${header}" | grep --regexp="${filter}")"
+            formatheader="$(echo "${filterheader}"                            \
                 | sed --expression="s/${filter}//g"                           \
                     --expression="0,/\${scriptName}/s//Usage: ${scriptName}/" \
-                    --expression="s/\${scriptName}/${scriptName}/g" || :
-        ;;
+                    --expression="s/\${scriptName}/${scriptName}/g"
+            )"
+
+            printf "%b\n" "${formatheader}"
+            ;;
         * )
             filter="^#[%/)+-]"
-            head -"${scriptHead:-99}" "${0}"                        \
-                | grep --regexp="${filter}"                         \
+            filterheader="$(echo "${header}" | grep --regexp="${filter}")"
+            formatheader="$(echo "${filterheader}"                  \
                 | sed --expression="s/${filter}//g"                 \
-                    --expression="s/\${scriptName}/${scriptName}/g" || :
-        ;;
+                    --expression="s/\${scriptName}/${scriptName}/g"
+            )"
+
+            printf "%b\n" "${formatheader}"
+            ;;
     esac
 }
 
