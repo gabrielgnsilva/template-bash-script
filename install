@@ -406,6 +406,8 @@ function _main() {
 
     #TODO Define script logic from here
     # ...
+
+    println "${scriptName}: script completed successfully"
 }
 
 # Invoke main with args only if not sourced
