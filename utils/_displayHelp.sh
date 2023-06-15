@@ -47,7 +47,7 @@ function _displayHelp() {
                 | sed --expression="s/${filter}//g"    \
                     --expression="s/\${scriptName}//g" \
                     --expression="s/Version//g"        \
-                    --expression="s/ //g"
+                    --expression="s/ //g" || :
             ;;
         usage )
             filter="^#+[ ]*"
@@ -55,14 +55,14 @@ function _displayHelp() {
                 | grep --regexp="${filter}"                                   \
                 | sed --expression="s/${filter}//g"                           \
                     --expression="0,/\${scriptName}/s//Usage: ${scriptName}/" \
-                    --expression="s/\${scriptName}/${scriptName}/g"
+                    --expression="s/\${scriptName}/${scriptName}/g" || :
         ;;
         * )
             filter="^#[%/)+-]"
             head -"${scriptHead:-99}" "${0}"                        \
                 | grep --regexp="${filter}"                         \
                 | sed --expression="s/${filter}//g"                 \
-                    --expression="s/\${scriptName}/${scriptName}/g"
+                    --expression="s/\${scriptName}/${scriptName}/g" || :
         ;;
     esac
 }
