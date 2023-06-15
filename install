@@ -382,6 +382,7 @@ function _main() {
                 displayVersion >&3
                 exit 0
                 ;;
+            * ) : ;;
         esac
     done
 
