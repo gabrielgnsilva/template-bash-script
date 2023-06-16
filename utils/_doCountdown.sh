@@ -48,4 +48,6 @@ function doCountdown() {
         printf "\rCountdown: %s seconds remaining." "${i}"
         sleep 1
     done
+
+    printf "\n"
 }
